@@ -9,9 +9,7 @@ def select_path():
     path.set(path_)
 root=Tk()
 root.withdraw()
-#path='f:/Excel资料/黑科技开发/TXT读取/txt'
 path=askdirectory()
-#root.mainloop()
 print(path)
 file_names=os.listdir(str(path))
 name_lists=[]
