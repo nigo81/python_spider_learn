@@ -4,9 +4,6 @@ import xlwt
 from tkinter import *
 from tkinter.filedialog import askdirectory
 from xlwt import Workbook
-def select_path():
-    path_=askdirectory()
-    path.set(path_)
 root=Tk()
 root.withdraw()
 path=askdirectory()
