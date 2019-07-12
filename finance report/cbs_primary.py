@@ -44,41 +44,39 @@ class Login(object):
     #     print(username)
     def statement(self,stock):
         page_headers={
-            'Referer':'https://caibaoshuo.com/companies/' + stock[0:6] ,
+          #  'Referer':'https://caibaoshuo.com/companies/' + stock[0:6] ,
             'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36'
         }
-        url="https://caibaoshuo.com/companies/" + stock[:6] + "/financial_reports/ttm"
+        url="https://caibaoshuo.com/companies/" + stock[:6] 
         response=self.session.get(url,headers=page_headers)
         selector=etree.HTML(response.text)
-        lists=selector.xpath('//ul[@class="summary-list"]/li/text()')
-        lists=lists[:10]
+        lists_data=selector.xpath('//table[contains(@class,table)]//span/text()')
+        lists_ratio=selector.xpath('//table[contains(@class,table)]//span/@title')
         data=[stock]
         i=0
-        for li in lists:
+        for span in lists_ratio:
+            data.append(span)
+            data.append(lists_data[i])
+            #print(span)
+            #print(lists_data[i])
             i=i+1
-            data.append(li.split("：",1)[0].split(" ",1)[1])
-            data.append(li.split("：",1)[1])
         return data
 if __name__ == "__main__":
     login = Login()
-    login.login('18118732516')
+  #  login.login('18080072071')
     
     df=pd.read_csv('./data/company.csv',encoding='gbk')
     stock_codes=list(df.ts_code)
-    stock_codes=stock_codes[89:]
-    
+    stock_codes=stock_codes[1111:]
     count=0
-    
     for code in stock_codes:
         out=[]
         result=[]
-        try:
-            result=login.statement(code)
-        except:
-            print("未正常下载代码：" + code)
+        result=login.statement(code)
         out.append(result)
         df=pd.DataFrame(out)
-        df.to_csv('./data/statement.csv',mode='a',encoding='gbk',index=False,header=False)
+        df.to_csv('./data/ratio.csv',mode='a',encoding='gbk',index=False,header=False)
         count=count+1
         time.sleep(1)
         print("进度：" + str(count) + "/" + str(len(stock_codes))+"    当前代码:" + code)
+
