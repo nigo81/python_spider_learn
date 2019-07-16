@@ -53,22 +53,29 @@ class Forum(object):
             str2=re.search(pattern2,url).group(0)
             response=self.session.get('https://bbs.esnai.com/'+url,headers=headers,cookies=self.cookies)
             html=etree.HTML(response.text)
-            author=html.xpath('//div[@class="authi"]/a/text()')
+            #author=html.xpath('//div[@class="authi"]/a[@class="xw1"]/text()')
  
-            text=html.xpath('//div[@class="pgt"]//a[@class="last"]/text()')
+            text=html.xpath('//label/span/@title')
             if text :
-                count=int(text[0].split("... ",1)[1])
-            if "chenyiwei" in author:
+                count=int(re.search('(\d+)',text[0]).group(1))
+
+            if count==0:
+                
                 list_contents=list_contents.append(self.content_info(html))
             else:
-                if count!=0:
-                    for i in range(2,count):
-                        content_url='https://bbs.esnai.com/' +str1+str(i)+str2
-                        response_content=self.session.get(content_url,cookies=self.cookies)
-                        html=etree.HTML(response.text)
-                        author=html.xpath('//div[@class="authi"]/a/text()')
-                        if "chenyiwei" in author:
-                            list_contents=list_contents.append(self.content_info(html))
+                for i in range(1,count+1):
+                    headers={
+                        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36',
+                        'Referer':'https://bbs.esnai.com/'+url,
+                        'Upgrade-Insecure-Requests':'1',
+                        'Connection':'keep-alive'
+                    }
+                    content_url='https://bbs.esnai.com/' +str1+str(i)+str2
+                    response_content=self.session.get(content_url,headers=headers,cookies=self.cookies)
+                    html=etree.HTML(response_content.text)
+                    #author=html.xpath('//div[@class="authi"]/a[@class="xw1"]/text()')
+                    
+                    list_contents=list_contents.append(self.content_info(html))
         return list_contents
 
     def content_info(self,html):
@@ -168,14 +175,14 @@ class Forum(object):
 if __name__ == '__main__':
     forum=Forum()
     forum.cookies_load()
-#    forum.calc_pages()
+    forum.calc_pages()
 #    print(forum.pages)
     for i in range(1000,0,-1):
         url=forum.list_page(i)
         df=forum.content(url)
         df.to_csv('./data/chenyiwei.csv',encoding='GB18030',index=False,header=False,mode='a')
         print('目前第'+ str(i) + '页，进度为' + str(round((1000-i)/10,2)) + '%')
-    # html=forum.one_page('https://bbs.esnai.com/thread-5057470-1-1.html')
+    # html=forum.one_page('https://bbs.esnai.com/thread-5162331-2-17.html')
     # df=forum.content_info(html)
     # df.to_csv('./data/chenyiwei.csv',encoding='GB18030',index=False,header=False,mode='a')
 
