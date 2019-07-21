@@ -8,8 +8,9 @@
 import scrapy
 
 
-class CpaItem(scrapy.Item):
+class AgencyItem(scrapy.Item): #19
     # define the fields for your item here like:
+    mode=scrapy.Field()
     agency_code = scrapy.Field()
     agency_name=scrapy.Field()
     agency_address=scrapy.Field()
@@ -29,3 +30,24 @@ class CpaItem(scrapy.Item):
     agency_stuff=scrapy.Field()
     agency_totalcpa=scrapy.Field()
     agency_totalstuff=scrapy.Field()
+
+class CpaItem(scrapy.Item): # 18
+    mode=scrapy.Field()
+    name=scrapy.Field()
+    gender=scrapy.Field()
+    birth=scrapy.Field()
+    duty=scrapy.Field()
+    party=scrapy.Field()
+    education=scrapy.Field()
+    degree=scrapy.Field()
+    profession=scrapy.Field()
+    school=scrapy.Field()
+    method=scrapy.Field()
+    exam_no=scrapy.Field()
+    exam_year=scrapy.Field()
+    certi_no=scrapy.Field()
+    partner=scrapy.Field()
+    certi_doc=scrapy.Field()
+    certi_time=scrapy.Field()
+    certi_agency=scrapy.Field()
+    punish=scrapy.Field()
