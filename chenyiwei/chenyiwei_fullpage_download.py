@@ -38,7 +38,7 @@ class Forum(object):
         html=etree.HTML(response.text)
         link=html.xpath('//th[@class="common"]/a[contains(@class,"xst")]/@href')
         return link
-    def content(self,list_url):
+    def content(self,list_url,list_name):
         list_contents=pd.DataFrame(columns=['A','B','C','D','E','F','G','H','I','J'])
         headers={
             'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36',
@@ -61,7 +61,7 @@ class Forum(object):
 
             if count==0:
                 
-                list_contents=list_contents.append(self.content_info(html))
+                list_contents=list_contents.append(self.content_info(html,list_name))
             else:
                 for i in range(1,count+1):
                     headers={
@@ -75,10 +75,10 @@ class Forum(object):
                     html=etree.HTML(response_content.text)
                     #author=html.xpath('//div[@class="authi"]/a[@class="xw1"]/text()')
                     
-                    list_contents=list_contents.append(self.content_info(html))
+                    list_contents=list_contents.append(self.content_info(html,list_name))
         return list_contents
 
-    def content_info(self,html):
+    def content_info(self,html,list_name):
         title=html.xpath('//h1/span/text()')
 #        title=title.split(" - CPA业务探讨 -  ",1)(0)
         link=html.xpath('//head/link[@rel="canonical"]/@href')
@@ -109,7 +109,7 @@ class Forum(object):
             i=0
             output=pd.DataFrame(columns=['A','B','C','D','E','F','G','H','I','J'])
             for author in authors:
-                if author=="chenyiwei":
+                if author in list_name:
                     try:
                         row=row_initial[:]
                         row.append(re.search("(\d+)",postmessages[i]).group(1)) # pid
@@ -129,7 +129,10 @@ class Forum(object):
             
             for cm in plus_comments:
                 author2=cm.xpath('.//a[contains(@class,xw1)]/text()')
-                if 'chenyiwei' in author2:
+                author_name=""
+                if author2:
+                    author_name=author2[0]
+                if author_name in list_name:
                     try:
                         row=row_initial[:]
                         text1=cm.xpath('../div[@class="t_fsz"]/table/tr/td/text()')
@@ -177,10 +180,11 @@ if __name__ == '__main__':
     forum.cookies_load()
     forum.calc_pages()
 #    print(forum.pages)
+    list_name=['chenyiwei', 'aegis','fanxu7788','nikankan','henry204618', '复制忍者卡卡西']
     for i in range(1000,0,-1):
         url=forum.list_page(i)
-        df=forum.content(url)
-        df.to_csv('./data/chenyiwei.csv',encoding='GB18030',index=False,header=False,mode='a')
+        df=forum.content(url,list_name)
+        df.to_csv('./data/banzhu.csv',encoding='GB18030',index=False,header=False,mode='a')
         print('目前第'+ str(i) + '页，进度为' + str(round((1000-i)/10,2)) + '%')
     # html=forum.one_page('https://bbs.esnai.com/thread-5162331-2-17.html')
     # df=forum.content_info(html)
