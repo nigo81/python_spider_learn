@@ -36,7 +36,8 @@ class AgencySpider(scrapy.Spider):
             'Referer':'http://cmispub.cicpa.org.cn/cicpa2_web/public/query2/1/00.shtml',
             'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko Core/1.70.3676.400 QQBrowser/10.4.3505.400'
         }
-        for i in range(2,3):#int(total_pages)+1
+        print("nigo:total pages" +str( int(total_pages)+1))
+        for i in range(1,int(total_pages)+1): #int(total_pages)+1
             data={
                 'pageSize':'15',
                 'pageNum':str(i),
@@ -61,17 +62,14 @@ class AgencySpider(scrapy.Spider):
             item['agency_contact_peple']=tr.xpath('./td/text()').extract()[3]
             item['agency_contact_phone']=tr.xpath('./td/text()').extract()[4]
             #print(item)
-
+            # 获取机构详细页的ID链接
             info=tr.xpath('./td/a/@href').extract_first()
-            print(info)
 
             page_id=re.search("'(\w+)','(\d+)'",info).group(1)
-            print(page_id)
             url='http://cmispub.cicpa.org.cn/cicpa2_web/09/' + page_id +'.shtml'
             yield scrapy.Request(url,callback=self.parse_agency,meta=item,dont_filter=True)
             #yield item
     def parse_agency(self, response):
-        print("nigo:parse")
         item=response.meta
         item['agency_certify']=response.xpath('//*[@id="detailtb"]/tr[3]/td[4]/text()').extract_first().strip()
         item['agency_gov']=response.xpath('//*[@id="detailtb"]/tr[9]/td[2]/text()').extract_first().strip()
@@ -81,7 +79,11 @@ class AgencySpider(scrapy.Spider):
         item['agency_asset']=response.xpath('//*[@id="detailtb"]/tr[10]/td[4]/text()').extract_first().strip()
         item['agency_structrue']=response.xpath('//*[@id="detailtb"]/tr[10]/td[6]/text()').extract_first().strip()
         item['agency_accountor']=response.xpath('//*[@id="detailtb"]/tr[11]/td[2]/text()').extract_first().strip()
-        item['agency_child']=response.xpath('//*[@id="detailtb"]/tr[12]/td[2]/text()').extract_first().strip()
+        child=response.xpath('//*[@id="detailtb"]/tr[12]/td[2]/text()').extract_first()
+        try:
+            item['agency_child']=child.split("（详见设立分所情况）",1)[0].strip()
+        except:
+            item['agency_child']=0
         partner=response.xpath('//*[@id="detailtb"]/tr[12]/td[4]/a/text()').extract_first()
         try:
             item['agency_partner']=partner.split("（请点击）",1)[0].strip()
