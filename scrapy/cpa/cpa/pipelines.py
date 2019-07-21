@@ -21,13 +21,30 @@ class CpaPipeline(object):
         item_csv.append(item["agency_address"])
         item_csv.append(item["agency_contact_peple"])
         item_csv.append(item["agency_contact_phone"])
+        item_csv.append(item["agency_certify"])
+        item_csv.append(item["agency_gov"])
+        item_csv.append(item["agency_doc"])
+        item_csv.append(item["agency_starttime"])
+        item_csv.append(item["agency_boss"])
+        item_csv.append(item["agency_asset"])
+        item_csv.append(item["agency_structrue"])
+        item_csv.append(item["agency_accountor"])
+        item_csv.append(item["agency_child"])
+        item_csv.append(item["agency_partner"])
+        item_csv.append(item["agency_cpa"])
+        item_csv.append(item["agency_stuff"])
+        item_csv.append(item["agency_totalcpa"])
+        item_csv.append(item["agency_totalstuff"])
 
         self.csv_items.append(item_csv)
         #return item
 
     def close_spider(self,spider):
         writer = csv.writer(self.csv_file)
-        writer.writerow(["agency_code","agency_name","agency_address","agency_contact_peple","agency_phone"])
+        writer.writerow(["agency_code","agency_name","agency_address","agency_contact_peple","agency_phone",
+        "agency_certify","agency_gov","agency_doc","agency_starttime","agency_boss","agency_asset",
+        "agency_structrue","agency_accountor","agency_child","agency_partner","agency_cpa",
+        "agency_stuff","agency_totalcpa","agency_totalstuff"])
         writer.writerows(self.csv_items)
 
         self.csv_file.close()
